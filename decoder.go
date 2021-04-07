@@ -135,18 +135,18 @@ func (dec *Decoder) DecodeFloat32(data []byte, pcm []float32) (int, error) {
 //
 // Note that DecodeFEC automatically falls back to PLC when no FEC data is
 // available in the provided packet.
-func (dec *Decoder) DecodeFEC(data []byte, pcm []int16) error {
+func (dec *Decoder) DecodeFEC(data []byte, pcm []int16) (int,error) {
 	if dec.p == nil {
-		return errDecUninitialized
+		return 0,errDecUninitialized
 	}
 	if len(data) == 0 {
-		return fmt.Errorf("opus: no data supplied")
+		return 0,fmt.Errorf("opus: no data supplied")
 	}
 	if len(pcm) == 0 {
-		return fmt.Errorf("opus: target buffer empty")
+		return 0,fmt.Errorf("opus: target buffer empty")
 	}
 	if cap(pcm)%dec.channels != 0 {
-		return fmt.Errorf("opus: target buffer capacity must be multiple of channels")
+		return 0,fmt.Errorf("opus: target buffer capacity must be multiple of channels")
 	}
 	n := int(C.opus_decode(
 		dec.p,
@@ -156,26 +156,26 @@ func (dec *Decoder) DecodeFEC(data []byte, pcm []int16) error {
 		C.int(cap(pcm)/dec.channels),
 		1))
 	if n < 0 {
-		return Error(n)
+		return 0,Error(n)
 	}
-	return nil
+	return n,nil
 }
 
 // DecodeFECFloat32 encoded Opus data into the supplied buffer with forward error
 // correction. It is to be used on the packet directly following the lost one.
 // The supplied buffer needs to be exactly the duration of audio that is missing
-func (dec *Decoder) DecodeFECFloat32(data []byte, pcm []float32) error {
+func (dec *Decoder) DecodeFECFloat32(data []byte, pcm []float32) (int,error) {
 	if dec.p == nil {
-		return errDecUninitialized
+		return 0,errDecUninitialized
 	}
 	if len(data) == 0 {
-		return fmt.Errorf("opus: no data supplied")
+		return 0,fmt.Errorf("opus: no data supplied")
 	}
 	if len(pcm) == 0 {
-		return fmt.Errorf("opus: target buffer empty")
+		return 0,fmt.Errorf("opus: target buffer empty")
 	}
 	if cap(pcm)%dec.channels != 0 {
-		return fmt.Errorf("opus: target buffer capacity must be multiple of channels")
+		return 0,fmt.Errorf("opus: target buffer capacity must be multiple of channels")
 	}
 	n := int(C.opus_decode_float(
 		dec.p,
@@ -185,9 +185,9 @@ func (dec *Decoder) DecodeFECFloat32(data []byte, pcm []float32) error {
 		C.int(cap(pcm)/dec.channels),
 		1))
 	if n < 0 {
-		return Error(n)
+		return 0,Error(n)
 	}
-	return nil
+	return n,nil
 }
 
 // DecodePLC recovers a lost packet using Opus Packet Loss Concealment feature.

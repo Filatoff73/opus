@@ -92,6 +92,25 @@ bridge_encoder_get_packet_loss_perc(OpusEncoder *st, opus_int32 *loss_perc)
 	return opus_encoder_ctl(st, OPUS_GET_PACKET_LOSS_PERC(loss_perc));
 }
 
+int
+bridge_encoder_set_vbr(OpusEncoder *st, opus_int32 isVbr)
+{
+	return opus_encoder_ctl(st, OPUS_SET_VBR(isVbr));
+}
+
+int
+bridge_encoder_get_vbr(OpusEncoder *st, opus_int32 *isVbr)
+{
+	return opus_encoder_ctl(st, OPUS_GET_VBR(isVbr));
+}
+
+int
+bridge_encoder_set_expert_frame_duration(OpusEncoder *st, opus_int32 duration)
+{
+	return opus_encoder_ctl(st, OPUS_SET_EXPERT_FRAME_DURATION(duration));
+}
+
+
 */
 import "C"
 
@@ -368,3 +387,34 @@ func (enc *Encoder) PacketLossPerc() (int, error) {
 	}
 	return int(lossPerc), nil
 }
+
+func (enc *Encoder) SetIsVBR(isVbr bool) error {
+	i := 0
+	if isVbr {
+		i = 1
+	}
+	res := C.bridge_encoder_set_vbr(enc.p, C.opus_int32(i))
+	if res != C.OPUS_OK {
+		return Error(res)
+	}
+	return nil
+}
+
+func (enc *Encoder) IsVBR() (bool, error) {
+	var isVbr C.opus_int32
+	res := C.bridge_encoder_get_vbr(enc.p, &isVbr)
+	if res != C.OPUS_OK {
+		return false, Error(res)
+	}
+	return isVbr!=0, nil
+}
+
+func (enc *Encoder) SetExpertFrameDuration(duration int) error {
+
+	res := C.bridge_encoder_set_expert_frame_duration(enc.p, C.opus_int32(duration))
+	if res != C.OPUS_OK {
+		return Error(res)
+	}
+	return nil
+}
+
