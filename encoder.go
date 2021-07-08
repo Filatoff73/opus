@@ -110,6 +110,12 @@ bridge_encoder_set_expert_frame_duration(OpusEncoder *st, opus_int32 duration)
 	return opus_encoder_ctl(st, OPUS_SET_EXPERT_FRAME_DURATION(duration));
 }
 
+int
+bridge_encoder_set_signal(OpusEncoder *st, opus_int32 signal)
+{
+	return opus_encoder_ctl(st, OPUS_SET_SIGNAL(signal));
+}
+
 
 */
 import "C"
@@ -199,7 +205,7 @@ func (enc *Encoder) Encode(pcm []int16, data []byte) (int, error) {
 		(*C.opus_int16)(&pcm[0]),
 		C.int(samples),
 		(*C.uchar)(&data[0]),
-		C.opus_int32(cap(data))))
+		C.opus_int32(len(data))))
 	if n < 0 {
 		return 0, Error(n)
 	}
@@ -227,7 +233,7 @@ func (enc *Encoder) EncodeFloat32(pcm []float32, data []byte) (int, error) {
 		(*C.float)(&pcm[0]),
 		C.int(samples),
 		(*C.uchar)(&data[0]),
-		C.opus_int32(cap(data))))
+		C.opus_int32(len(data))))
 	if n < 0 {
 		return 0, Error(n)
 	}
@@ -412,6 +418,15 @@ func (enc *Encoder) IsVBR() (bool, error) {
 func (enc *Encoder) SetExpertFrameDuration(duration int) error {
 
 	res := C.bridge_encoder_set_expert_frame_duration(enc.p, C.opus_int32(duration))
+	if res != C.OPUS_OK {
+		return Error(res)
+	}
+	return nil
+}
+
+func (enc *Encoder) SetSignal(signal Signal) error {
+
+	res := C.bridge_encoder_set_signal(enc.p, C.opus_int32(signal))
 	if res != C.OPUS_OK {
 		return Error(res)
 	}

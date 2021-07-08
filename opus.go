@@ -22,6 +22,14 @@ const (
 	AppRestrictedLowdelay = Application(C.OPUS_APPLICATION_RESTRICTED_LOWDELAY)
 )
 
+type Signal int
+
+const (
+	SignalVoice = Signal(C.OPUS_SIGNAL_VOICE)
+	SignalMusic = Signal(C.OPUS_SIGNAL_MUSIC)
+	SignalAuto= Signal(C.OPUS_AUTO)
+)
+
 const (
 	xMAX_BITRATE       = 48000
 	xMAX_FRAME_SIZE_MS = 60
