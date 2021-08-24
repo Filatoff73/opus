@@ -182,6 +182,11 @@ func (enc *Encoder) Init(sample_rate int, channels int, application Application)
 	return nil
 }
 
+// Нет необходимости чтото делать, автоматически удалиться сбощиком мусора го
+func (enc *Encoder) Close() error {
+	return nil
+}
+
 // Encode raw PCM data and store the result in the supplied buffer. On success,
 // returns the number of bytes used up by the encoded data.
 func (enc *Encoder) Encode(pcm []int16, data []byte) (int, error) {

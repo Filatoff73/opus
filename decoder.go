@@ -64,6 +64,11 @@ func (dec *Decoder) Init(sample_rate int, channels int) error {
 	return nil
 }
 
+// Нет необходимости чтото делать, автоматически удалиться сбощиком мусора го
+func (dec *Decoder) Close() error {
+	return nil
+}
+
 // Decode encoded Opus data into the supplied buffer. On success, returns the
 // number of samples correctly written to the target buffer.
 func (dec *Decoder) Decode(data []byte, pcm []int16) (int, error) {
